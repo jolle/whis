@@ -1,6 +1,6 @@
 {
     "name": "whis",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "description": "A simple whois client",
     "main": "build/index",
     "author": "jolle",
@@ -17,5 +17,9 @@
     },
     "scripts": {
         "test": "./node_modules/.bin/jest"
+    },
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/jolle/whis"
     }
 }
