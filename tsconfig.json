@@ -1,0 +1,12 @@
+{
+    "compilerOptions": {
+        "target": "es5",
+        "module": "commonjs",
+        "lib": ["es2018"],
+        "declaration": true,
+        "outDir": "./build",
+        "strict": true,
+        "esModuleInterop": true
+    },
+    "exclude": ["node_modules", "__tests__", "__mocks__", "build"]
+}
