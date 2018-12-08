@@ -1,0 +1,7 @@
+src
+__tests__
+__mocks__
+node_modules
+tsconfig.json
+.travis.yml
+jest.config.js
