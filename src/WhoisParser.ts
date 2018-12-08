@@ -56,6 +56,30 @@ const aliasKeys = [
     }
 ];
 
+const nonExistentSignatures = [
+    'NOT FOUND',
+    'No Data Found',
+    'No match for',
+    'This domain name has not been registered.',
+    'Domain not found',
+    'The queried object does not exist',
+    'El dominio no se encuentra registrado',
+    'is available for registration',
+    'is free',
+    'Invalid domain name',
+    'Domain Not Found',
+    'Object does not exist',
+    'domain name not known',
+    'No matching record.',
+    'No information was found matching that query.',
+    'not found...',
+    'syntax error in specified domain name',
+    'NO MATCH',
+    'No entries found',
+    'not found',
+    'The domain has not been registered'
+];
+
 /**
  * Filters out commeted lines and converts every line to a
  * JS object key–value pair with multiple values made into an array.
@@ -121,6 +145,7 @@ export interface WhoisResult {
     nameServer?: string | string[];
     DNSSEC?: string | string[];
     [unknownKey: string]: any;
+    exists: boolean;
 }
 
 /**
@@ -128,8 +153,13 @@ export interface WhoisResult {
  *
  * @param {string} data – raw WHOIS data to parse from
  */
-export default (data: string): WhoisResult =>
-    Object.entries(parseWhois(data))
+export default (data: string): WhoisResult => ({
+    exists:
+        nonExistentSignatures.findIndex(sign =>
+            new RegExp(sign, 'i').test(data)
+        ) === -1,
+    ...Object.entries(parseWhois(data))
         .map(([key, value]) => ({ value, alias: findAliasByKey(key) }))
         .map(({ value, alias }) => [alias.to, alias.modifier(value)])
-        .reduce((p, n) => ({ ...p, [n[0]]: n[1] }), {});
+        .reduce((p, n) => ({ ...p, [n[0]]: n[1] }), {})
+});
