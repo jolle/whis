@@ -126,7 +126,9 @@ export const parseWhois = (
  *
  * @param {string} key – the key that'll be used to find the alias
  */
-const findAliasByKey = (key: string): { modifier: Function; to: string } => ({
+const findAliasByKey = (
+    key: string
+): { modifier: Function; to: string; from?: any } => ({
     to: key,
     modifier: (a: any) => a, // these will be overridden by the spreading if an actual modifier is found
     ...(aliasKeys.find(({ from }) => from.includes(key.toLowerCase())) || {})
