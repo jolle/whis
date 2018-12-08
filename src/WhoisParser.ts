@@ -62,7 +62,9 @@ const aliasKeys = [
  *
  * @param {[key: string]: string | string[]} data – the raw WHOIS response data
  */
-const parseWhois = (data: string): { [key: string]: string | string[] } =>
+export const parseWhois = (
+    data: string
+): { [key: string]: string | string[] } =>
     data
         .split('\n')
         .filter(line => line.length > 0 && !line.startsWith('%'))

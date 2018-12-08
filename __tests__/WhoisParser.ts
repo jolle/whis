@@ -1,8 +1,9 @@
 import { WhoisParser } from '../src';
+import { parseWhois } from '../src/WhoisParser';
 
 describe('WhoisParser', () => {
     it('ignores commented lines', () => {
-        const { raw } = WhoisParser(
+        const raw = parseWhois(
             '% commented line\n\nproperty: value\n% another comment'
         );
         expect(Object.keys(raw)).toHaveLength(1);
