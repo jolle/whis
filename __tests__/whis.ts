@@ -15,7 +15,7 @@ describe('whis', () => {
     it('retrieves correct WHOIS data', () => {
         expect.assertions(5);
 
-        return whis('anything', false, 'anything').then((data: any) => {
+        return whis('anything', 'anything').then((data: any) => {
             expect(data).toBeInstanceOf(Object);
 
             expect(data).toHaveProperty('registrar');
