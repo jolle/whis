@@ -6,13 +6,15 @@ A very simple and minimal WHOIS library. WHOIS server is got from [whis-data](ht
 
 ## Usage
 
-```
-> yarn add whis
+```sh
+$ yarn add whis
 ```
 
 (or `npm install whis`)
 
-### `whis(domain: string, raw?: boolean, server?: string) ⇒ Promise<WhoisData>`
+### `whis(domain: string, server?: string) ⇒ Promise<WhoisData>`
+
+### `getRaw(domain: string, server?: string) ⇒ Promise<string>`
 
 ### JavaScript (NodeJS)
 
@@ -22,7 +24,13 @@ const { whis } = require('whis');
 whis('jolle.io').then(data => console.log(data));
 ```
 
-### TypeScript
+```js
+const { getRaw } = require('whis');
+
+getRaw('jolle.io').then(data => console.log(data)); // this will print the raw WHOIS response
+```
+
+### TypeScript (and ES6+)
 
 TypeScript typings are included automatically. You do not need to install typings manually from an external repository or with the `@typings/*` packages.
 
@@ -32,12 +40,18 @@ import whis from 'whis';
 whis('jolle.io').then(data => console.log(data));
 ```
 
+```ts
+import { getRaw } from 'whis';
+
+getRaw('jolle.io').then(data => console.log(data)); // this will print the raw WHOIS response
+```
+
 ### Advanced usage
 
 ```ts
 import whis from 'whis';
 
-whis('intranet-service.corporation', false, 'internal-whois.com').then(data =>
+whis('intranet-service.corporation', 'internal-whois.com').then(data =>
     console.log(data)
-);
+); // this will use the WHOIS server in "internal-whois.com" to get the data about `intranet-service.corporation`.
 ```
