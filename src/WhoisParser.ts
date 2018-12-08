@@ -1,3 +1,4 @@
+// Tries to convert dates in string-form to an actual Date object.
 const dateModifier = () => (input: any): any =>
     input instanceof Array
         ? input.map(a => dateModifier()(a))
@@ -55,7 +56,13 @@ const aliasKeys = [
     }
 ];
 
-const parseWhois = (data: string) =>
+/**
+ * Filters out commeted lines and converts every line to a
+ * JS object key–value pair with multiple values made into an array.
+ *
+ * @param {[key: string]: string | string[]} data – the raw WHOIS response data
+ */
+const parseWhois = (data: string): { [key: string]: string | string[] } =>
     data
         .split('\n')
         .filter(line => line.length > 0 && !line.startsWith('%'))
@@ -87,8 +94,14 @@ const parseWhois = (data: string) =>
             {}
         );
 
+/**
+ * Tries to find an alias and a modifier by the key.
+ * Provies a default modifier function that returns the argument if no modifier found.
+ *
+ * @param {string} key – the key that'll be used to find the alias
+ */
 const findAliasByKey = (key: string): any => ({
-    modifier: (a: any) => a,
+    modifier: (a: any) => a, // this will be overridden by the spreading if an actual modifier is found
     ...(aliasKeys.find(({ from }) => from.includes(key.toLowerCase())) || {
         notFound: true
     })
@@ -106,7 +119,7 @@ export interface WhoisResult {
     registrarAbuseContactPhone?: string | string[];
     nameServer?: string | string[];
     DNSSEC?: string | string[];
-    [unknownKey: string]: string | string[] | undefined | Date;
+    [unknownKey: string]: any;
     raw: any;
 }
 
