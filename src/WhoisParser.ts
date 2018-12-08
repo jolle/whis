@@ -2,8 +2,8 @@ const dateModifier = () => (input: any): any =>
     input instanceof Array
         ? input.map(a => dateModifier()(a))
         : isNaN(+new Date(input))
-            ? input
-            : new Date(input);
+        ? input
+        : new Date(input);
 
 const aliasKeys = [
     {
@@ -43,7 +43,7 @@ const aliasKeys = [
     },
     {
         from: ['registrar abuse contact phone'],
-        to: 'registrarAbuseContactEmail'
+        to: 'registrarAbuseContactPhone'
     },
     {
         from: ['name server', 'nserver'],
@@ -94,12 +94,27 @@ const findAliasByKey = (key: string): any => ({
     })
 });
 
+export interface WhoisResult {
+    domain?: string | string[];
+    expiration?: Date;
+    created?: Date;
+    updated?: Date;
+    status?: string | string[];
+    registrar?: string | string[];
+    registrarIANAId?: string | string[];
+    registrarAbuseContactEmail?: string | string[];
+    registrarAbuseContactPhone?: string | string[];
+    nameServer?: string | string[];
+    DNSSEC?: string | string[];
+    [unknownKey: string]: string | string[] | undefined | Date;
+}
+
 /**
  * Parses given raw WHOIS data to JS object form
  *
  * @param {string} data – raw WHOIS data to parse from
  */
-export default (data: string): any => {
+export default (data: string): WhoisResult => {
     const whoisData = parseWhois(data);
     return {
         ...Object.keys(whoisData)
