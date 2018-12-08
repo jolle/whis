@@ -1,8 +1,8 @@
 import { TCPHelper } from './TCPHelper';
-import WhoisParser from './WhoisParser';
+import WhoisParser, { WhoisResult } from './WhoisParser';
 const whisData = require('whis-data');
 
-export { TCPHelper, WhoisParser };
+export { TCPHelper, WhoisParser, WhoisResult };
 
 const findWhoisServer = (tld: string): string | undefined =>
     tld &&
