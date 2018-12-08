@@ -107,6 +107,7 @@ export interface WhoisResult {
     nameServer?: string | string[];
     DNSSEC?: string | string[];
     [unknownKey: string]: string | string[] | undefined | Date;
+    raw: any;
 }
 
 /**
