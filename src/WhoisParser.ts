@@ -100,11 +100,10 @@ const parseWhois = (data: string): { [key: string]: string | string[] } =>
  *
  * @param {string} key – the key that'll be used to find the alias
  */
-const findAliasByKey = (key: string): any => ({
-    modifier: (a: any) => a, // this will be overridden by the spreading if an actual modifier is found
-    ...(aliasKeys.find(({ from }) => from.includes(key.toLowerCase())) || {
-        notFound: true
-    })
+const findAliasByKey = (key: string): { modifier: Function; to: string } => ({
+    to: key,
+    modifier: (a: any) => a, // these will be overridden by the spreading if an actual modifier is found
+    ...(aliasKeys.find(({ from }) => from.includes(key.toLowerCase())) || {})
 });
 
 export interface WhoisResult {
@@ -120,7 +119,6 @@ export interface WhoisResult {
     nameServer?: string | string[];
     DNSSEC?: string | string[];
     [unknownKey: string]: any;
-    raw: any;
 }
 
 /**
@@ -128,16 +126,8 @@ export interface WhoisResult {
  *
  * @param {string} data – raw WHOIS data to parse from
  */
-export default (data: string): WhoisResult => {
-    const whoisData = parseWhois(data);
-    return {
-        ...Object.keys(whoisData)
-            .map(key => ({ key, alias: findAliasByKey(key) }))
-            .filter(({ alias }) => !alias.notFound)
-            .map(({ key, alias }) => ({
-                [alias.to]: alias.modifier(whoisData[key])
-            }))
-            .reduce((p, n) => ({ ...p, ...n }), {}),
-        raw: whoisData
-    };
-};
+export default (data: string): WhoisResult =>
+    Object.entries(parseWhois(data))
+        .map(([key, value]) => ({ value, alias: findAliasByKey(key) }))
+        .map(({ value, alias }) => [alias.to, alias.modifier(value)])
+        .reduce((p, n) => ({ ...p, [n[0]]: n[1] }), {});
