@@ -46,4 +46,22 @@ describe('WhoisParser', () => {
         expect(result).toHaveProperty('domain');
         expect(result.domain).toEqual('value');
     });
+
+    it('detects a non-existent domain', () => {
+        const result = WhoisParser(
+            'Domain not found.\r\n\r\nTerms of Use: Example Co.'
+        );
+
+        expect(result).toHaveProperty('exists');
+        expect(result.exists).toBeFalsy();
+    });
+
+    it('detects an existent domain', () => {
+        const result = WhoisParser(
+            'somekey: somevalue\r\n\r\nTerms of Use: Example Co.'
+        );
+
+        expect(result).toHaveProperty('exists');
+        expect(result.exists).toBeTruthy();
+    });
 });
