@@ -91,7 +91,7 @@ export const parseWhois = (
 ): { [key: string]: string | string[] } =>
     data
         .split('\n')
-        .filter(line => line.length > 0 && !line.startsWith('%'))
+        .filter(line => line.length > 0 && !['#', '%', '>'].includes(line[0]))
         .map(line => line.split(/:\s+/))
         .map(line => ({
             key: line[0].trim(),
