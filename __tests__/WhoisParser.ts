@@ -64,4 +64,28 @@ describe('WhoisParser', () => {
         expect(result).toHaveProperty('exists');
         expect(result.exists).toBeTruthy();
     });
+
+    it('removes commented lines (>>> … <<<)', () => {
+        expect(
+            Object.keys(WhoisParser('>>> LAST UPDATE: NEVER <<<')).findIndex(
+                key => key.startsWith('>')
+            )
+        ).toBe(-1);
+    });
+
+    it('removes commented lines (% …)', () => {
+        expect(
+            Object.keys(WhoisParser('% This is a disclaimer')).findIndex(key =>
+                key.startsWith('%')
+            )
+        ).toBe(-1);
+    });
+
+    it('removes commented lines (# …)', () => {
+        expect(
+            Object.keys(WhoisParser('# This is a disclaimer')).findIndex(key =>
+                key.startsWith('%')
+            )
+        ).toBe(-1);
+    });
 });
