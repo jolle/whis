@@ -7,7 +7,7 @@
   "license": "MIT",
   "typings": "dist/index",
   "dependencies": {
-    "whis-data": "^1.0.0"
+    "whis-data": "1.2.x"
   },
   "devDependencies": {
     "@types/jest": "^29.2.5",
@@ -27,5 +27,6 @@
   "repository": {
     "type": "git",
     "url": "https://github.com/jolle/whis"
-  }
+  },
+  "peerDependencies": {}
 }

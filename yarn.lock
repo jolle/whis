@@ -2725,9 +2725,10 @@ which@^2.0.1:
   dependencies:
     isexe "^2.0.0"
 
-whis-data@^1.0.0:
-  version "1.0.0"
-  resolved "https://registry.yarnpkg.com/whis-data/-/whis-data-1.0.0.tgz#68ae4565205d8130f5cfc9e69854c7e46e812438"
+whis-data@1.2.x:
+  version "1.2.20230101"
+  resolved "https://registry.yarnpkg.com/whis-data/-/whis-data-1.2.20230101.tgz#aafa5a14bf3c4455ed166b00f81f69ad1f0d5154"
+  integrity sha512-uQ9qXzl4+8fShZoKX4DR2v/OZEPVfEGcD9XEjzPBF4B8r9WPl1n3ZdULrLEAI1ji4IVufIysfsD9oUlVtchKjg==
 
 word-wrap@^1.2.3:
   version "1.2.3"
