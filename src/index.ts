@@ -17,15 +17,25 @@ const findWhoisServer = (tld: string): string | undefined =>
  * @param {string} [server] – custom WHOIS server to retrieve information from; if no server given, will get server from whis-data
  */
 const getRaw = async (domain: string, server?: string) => {
-  const whoisServer = server || findWhoisServer(domain);
+  const whoisServer = server ?? findWhoisServer(domain);
   if (!whoisServer) throw Error('Whois server not found');
 
   const tcp = new TCPHelper(whoisServer, 43);
-  const data = await tcp.send(domain, true);
 
-  if (!data) throw Error("Whois server didn't reply with any data");
+  return new Promise<string>(async (resolve, reject) => {
+    let hasError = false;
+    tcp.on('error', (err) => {
+      hasError = true;
+      reject(err);
+    });
 
-  return data.toString();
+    const data = await tcp.send(domain, true);
+    if (hasError) return;
+
+    if (!data) return reject(Error("Whois server didn't reply with any data"));
+
+    resolve(data.toString());
+  });
 };
 
 /**

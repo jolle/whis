@@ -1,21 +1,33 @@
 import { EventEmitter } from 'events';
 
-const net: any = jest.genMockFromModule('net');
+const net = jest.createMockFromModule('net') as typeof import('net');
+
+const ECONNRESET_HOST = 'econnreset.local';
 
 net.Socket = class Socket extends EventEmitter {
-  writable: boolean;
+  writable: boolean = false;
+  private host?: string;
 
   constructor() {
     super();
-
-    this.writable = true;
   }
 
   connect(port: number, host: string, callback: Function) {
+    this.host = host;
+    this.writable = true;
+
+    if (host === ECONNRESET_HOST) {
+      setTimeout(() => this.emit('error', Error('read ECONNRESET')), 1);
+    }
+
     callback();
   }
 
-  write(data: any) {
+  write(data: unknown) {
+    if (this.host === ECONNRESET_HOST) {
+      return;
+    }
+
     setTimeout(() => {
       this.emit(
         'data',
@@ -26,9 +38,9 @@ net.Socket = class Socket extends EventEmitter {
 
       setTimeout(() => {
         this.emit('close');
-      }, 100);
-    }, 1000);
+      }, 10);
+    }, 10);
   }
-};
+} as typeof net.Socket;
 
 module.exports = net;

@@ -1,14 +1,14 @@
-// Tries to convert dates in string-form to an actual Date object.
-const dateModifier =
-  () =>
-  (input: any): any =>
-    input instanceof Array
-      ? input.map((a) => dateModifier()(a))
-      : isNaN(+new Date(input))
-      ? input
-      : new Date(input);
+type ModifierFn = (input: string) => unknown;
 
-const aliasKeys = [
+// Tries to convert dates in string-form to an actual Date object.
+const dateModifier: ModifierFn = (input) =>
+  isNaN(+new Date(input)) ? input : new Date(input);
+
+const aliasKeys: {
+  from: string[];
+  to: string;
+  modifier?: ModifierFn;
+}[] = [
   {
     from: ['domain name', 'domain'],
     to: 'domain',
@@ -16,17 +16,17 @@ const aliasKeys = [
   {
     from: ['expiry date', 'registry expiry date'],
     to: 'expiration',
-    modifier: dateModifier(),
+    modifier: dateModifier,
   },
   {
     from: ['created', 'creation date'],
     to: 'created',
-    modifier: dateModifier(),
+    modifier: dateModifier,
   },
   {
     from: ['updated date', 'last-update'],
     to: 'updated',
-    modifier: dateModifier(),
+    modifier: dateModifier,
   },
   {
     from: ['status', 'domain status'],
@@ -83,7 +83,7 @@ const nonExistentSignatures = [
 ];
 
 /**
- * Filters out commeted lines and converts every line to a
+ * Filters out commented lines and converts every line to a
  * JS object key–value pair with multiple values made into an array.
  *
  * @param {[key: string]: string | string[]} data – the raw WHOIS response data
@@ -92,30 +92,29 @@ export const parseWhois = (
   data: string,
 ): { [key: string]: string | string[] } =>
   data
-    .split('\n')
+    .split(/\r?\n/)
     .filter((line) => line.length > 0 && !['#', '%', '>'].includes(line[0]))
-    .map((line) => line.split(/:\s+/))
-    .map((line) => ({
-      key: line[0].trim(),
-      value: line
-        .slice(1)
-        .join(': ') // if there happens to be `: ` somewhere in the property value, this will restore them (not accounting for extra spaces)
-        .trim(),
+    .map((line) => line.split(/:(\s+)/))
+    .map(([key, _, ...values]) => ({
+      key,
+      value: values.join(':').trim(),
     }))
-    .reduce(
-      (previous: any, { key, value }: { key: string; value: string }) => ({
-        ...previous,
-        ...{
-          [key]: previous[key] // if there is already a property using the same key, create an array containing all values.
+    .reduce<Record<string, string | string[]>>(
+      (previous, { key, value }: { key: string; value: string }) => {
+        const previousValue = previous[key];
+
+        return {
+          ...previous,
+          [key]: previousValue // if there is already a property using the same key, create an array containing all values.
             ? [
-                ...(previous[key] instanceof Array
-                  ? previous[key]
-                  : [previous[key]]),
+                ...(previousValue instanceof Array
+                  ? previousValue
+                  : [previousValue]),
                 value,
               ]
             : value,
-        },
-      }),
+        };
+      },
       {},
     );
 
@@ -125,28 +124,30 @@ export const parseWhois = (
  *
  * @param {string} key – the key that'll be used to find the alias
  */
-const findAliasByKey = (
-  key: string,
-): { modifier: Function; to: string; from?: any } => ({
+const findAliasByKey = (key: string): { to: string; modifier: ModifierFn } => ({
   to: key,
-  modifier: (a: any) => a, // these will be overridden by the spreading if an actual modifier is found
-  ...(aliasKeys.find(({ from }) => from.includes(key.toLowerCase())) || {}),
+  modifier: (a) => a, // these will be overridden by the spreading if an actual modifier is found
+  ...(aliasKeys.find(({ from }) => from.includes(key.toLowerCase())) ?? {}),
 });
 
+type OneOrMultiple<T> = T | T[];
+
 export interface WhoisResult {
-  domain?: string | string[];
-  expiration?: Date;
-  created?: Date;
-  updated?: Date;
-  status?: string | string[];
-  registrar?: string | string[];
-  registrarIANAId?: string | string[];
-  registrarAbuseContactEmail?: string | string[];
-  registrarAbuseContactPhone?: string | string[];
-  nameServer?: string | string[];
-  DNSSEC?: string | string[];
-  [unknownKey: string]: any;
+  domain?: OneOrMultiple<string>;
+  expiration?: OneOrMultiple<Date>;
+  created?: OneOrMultiple<Date>;
+  updated?: OneOrMultiple<Date>;
+  status?: OneOrMultiple<string>;
+  registrar?: OneOrMultiple<string>;
+  registrarIANAId?: OneOrMultiple<string>;
+  registrarAbuseContactEmail?: OneOrMultiple<string>;
+  registrarAbuseContactPhone?: OneOrMultiple<string>;
+  nameServer?: OneOrMultiple<string>;
+  DNSSEC?: OneOrMultiple<string>;
   exists: boolean;
+
+  /** this is a string | string[] */
+  [key: string]: unknown; // 😔 https://github.com/microsoft/TypeScript/issues/17867
 }
 
 /**
@@ -159,8 +160,14 @@ export default (data: string): WhoisResult => ({
     nonExistentSignatures.findIndex((sign) =>
       new RegExp(sign, 'i').test(data),
     ) === -1,
-  ...Object.entries(parseWhois(data))
-    .map(([key, value]) => ({ value, alias: findAliasByKey(key) }))
-    .map(({ value, alias }) => [alias.to, alias.modifier(value)])
-    .reduce((p, n) => ({ ...p, [n[0]]: n[1] }), {}),
+  ...Object.fromEntries(
+    Object.entries(parseWhois(data))
+      .map(([key, value]) => ({ value, alias: findAliasByKey(key) }))
+      .map<[string, unknown]>(({ value, alias }) => [
+        alias.to,
+        value instanceof Array
+          ? value.map(alias.modifier)
+          : alias.modifier(value),
+      ]),
+  ),
 });

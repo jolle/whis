@@ -14,11 +14,11 @@ export class TCPHelper extends EventEmitter {
 
     this.client = new Socket();
 
-    this.client.connect(port, host, () => this.emit('connect'));
-
     this.client.on('data', (data) => this.emit('data', data));
     this.client.on('error', (error) => this.emit('error', error));
     this.client.on('close', () => this.emit('close'));
+
+    this.client.connect(port, host, () => this.emit('connect'));
   }
 
   /**
@@ -35,9 +35,9 @@ export class TCPHelper extends EventEmitter {
 
     if (getResponseUntilClose) {
       return new Promise((resolve) => {
-        let buffer = Buffer.from([]);
-        this.on('data', (data) => (buffer = Buffer.concat([buffer, data])));
-        this.on('close', () => resolve(buffer));
+        const buffers: Buffer[] = [];
+        this.on('data', (data) => buffers.push(data));
+        this.on('close', () => resolve(Buffer.concat(buffers)));
       });
     }
 

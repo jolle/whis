@@ -1,5 +1,7 @@
 import whis, { whis as whisProp } from '../src';
 
+const ECONNRESET_HOST = 'econnreset.local';
+
 jest.mock('net');
 
 describe('whis', () => {
@@ -12,17 +14,23 @@ describe('whis', () => {
     expect(whisProp).toEqual(whis);
   });
 
-  it('retrieves correct WHOIS data', () => {
-    expect.assertions(5);
+  it('retrieves correct WHOIS data', async () => {
+    const data = await whis('anything', 'anything');
 
-    return whis('anything', 'anything').then((data: any) => {
-      expect(data).toBeInstanceOf(Object);
+    expect(data).toHaveProperty('registrar');
+    expect(data.registrar).toContain('NameCheap, Inc');
+    expect(data).toHaveProperty('updated');
 
-      expect(data).toHaveProperty('registrar');
-      expect(data.registrar).toContain('NameCheap, Inc');
+    expect(data.updated).toBeInstanceOf(Array);
+    const updated = data.updated as Date[];
+    expect(updated).toHaveLength(2);
+    expect(updated[0]).toBeInstanceOf(Date);
+    expect(updated[0]).toEqual(new Date('2018-08-19T15:07:30.000Z'));
+  });
 
-      expect(data).toHaveProperty('updated');
-      expect(data.updated[0]).toBeInstanceOf(Date);
-    });
+  it('handles ECONNRESET correctly', async () => {
+    const fn = jest.fn();
+    await whis('anything', ECONNRESET_HOST).catch(fn);
+    expect(fn).toHaveBeenCalled();
   });
 });
