@@ -22,7 +22,7 @@
   "scripts": {
     "test": "jest",
     "build": "tsc --build tsconfig.build.json",
-    "lint": "eslint"
+    "lint": "eslint ."
   },
   "repository": {
     "type": "git",
