@@ -5,10 +5,10 @@ const whisData = require('whis-data');
 export { TCPHelper, WhoisParser, WhoisResult };
 
 const findWhoisServer = (tld: string): string | undefined =>
-    tld &&
-    (whisData[tld.toUpperCase()] ||
-        (tld.indexOf('.') > -1 &&
-            findWhoisServer(tld.substr(tld.indexOf('.') + 1))));
+  tld &&
+  (whisData[tld.toUpperCase()] ||
+    (tld.indexOf('.') > -1 &&
+      findWhoisServer(tld.substr(tld.indexOf('.') + 1))));
 
 /**
  * Gets the raw WHOIS response from the given domain.
@@ -17,15 +17,15 @@ const findWhoisServer = (tld: string): string | undefined =>
  * @param {string} [server] – custom WHOIS server to retrieve information from; if no server given, will get server from whis-data
  */
 const getRaw = async (domain: string, server?: string) => {
-    const whoisServer = server || findWhoisServer(domain);
-    if (!whoisServer) throw Error('Whois server not found');
+  const whoisServer = server || findWhoisServer(domain);
+  if (!whoisServer) throw Error('Whois server not found');
 
-    const tcp = new TCPHelper(whoisServer, 43);
-    const data = await tcp.send(domain, true);
+  const tcp = new TCPHelper(whoisServer, 43);
+  const data = await tcp.send(domain, true);
 
-    if (!data) throw Error("Whois server didn't reply with any data");
+  if (!data) throw Error("Whois server didn't reply with any data");
 
-    return data.toString();
+  return data.toString();
 };
 
 /**
@@ -35,7 +35,7 @@ const getRaw = async (domain: string, server?: string) => {
  * @param {string} [server] – custom WHOIS server to retrieve information from; if no server given, will get server from whis-data
  */
 const whis = async (domain: string, server?: string) =>
-    WhoisParser(await getRaw(domain, server));
+  WhoisParser(await getRaw(domain, server));
 
 export default whis;
 export { whis, getRaw };
