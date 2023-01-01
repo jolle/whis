@@ -1,8 +1,6 @@
 # whis
 
-[![Build Status](https://travis-ci.org/jolle/whis.svg?branch=master)](https://travis-ci.org/jolle/whis)
-
-A very simple and minimal WHOIS library. WHOIS server is got from [whis-data](https://yarnpkg.com/en/package/whis-data) which updates every seven days (from IANA). Please report issues like missing or incorrect WHOIS server data to the [whis-data repository](https://github.com/jolle/whis-data).
+A very simple and minimal WHOIS library. WHOIS server is got from [whis-data](https://yarnpkg.com/en/package/whis-data) which updates every month (from IANA). Please report issues like missing or incorrect WHOIS server data to the [whis-data repository](https://github.com/jolle/whis-data).
 
 ## Usage
 
