@@ -3,5 +3,10 @@ __tests__
 __mocks__
 node_modules
 tsconfig.json
-.travis.yml
+.github
 jest.config.js
+.prettierrc
+.eslintrc
+.gitignore
+tsconfig.json
+tsconfig.build.json
