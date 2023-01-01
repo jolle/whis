@@ -36,7 +36,8 @@ const getRaw = async (domain: string, server?: string) => {
         if (hasError) return;
 
         if (!buffer) {
-          throw Error('Domain not found');
+          reject(Error('Domain not found'));
+          return;
         }
 
         resolve(buffer.toString());
