@@ -5,14 +5,14 @@ const net = jest.createMockFromModule('net') as typeof import('net');
 const ECONNRESET_HOST = 'econnreset.local';
 
 net.Socket = class Socket extends EventEmitter {
-  writable: boolean = false;
+  writable = false;
   private host?: string;
 
   constructor() {
     super();
   }
 
-  connect(port: number, host: string, callback: Function) {
+  connect(port: number, host: string, callback: () => void) {
     this.host = host;
     this.writable = true;
 
@@ -23,7 +23,8 @@ net.Socket = class Socket extends EventEmitter {
     callback();
   }
 
-  write(data: unknown) {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  write(_: unknown) {
     if (this.host === ECONNRESET_HOST) {
       return;
     }

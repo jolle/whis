@@ -26,10 +26,7 @@ export class TCPHelper extends EventEmitter {
    * @param {message} message – the message to be written
    * @param {boolean} getResponseUntilClose – whether to respond with a promise that is resolved on socket close or not
    */
-  send(
-    message: any,
-    getResponseUntilClose: boolean = false,
-  ): Promise<Buffer | null> {
+  send(message: string, getResponseUntilClose = false): Promise<Buffer | null> {
     if (!this.client.writable) throw Error('Socket is not writable');
     this.client.write(`${message}\r\n`);
 

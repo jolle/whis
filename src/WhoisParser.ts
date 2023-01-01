@@ -95,9 +95,9 @@ export const parseWhois = (
     .split(/\r?\n/)
     .filter((line) => line.length > 0 && !['#', '%', '>'].includes(line[0]))
     .map((line) => line.split(/:(\s+)/))
-    .map(([key, _, ...values]) => ({
+    .map(([key, ...values]) => ({
       key,
-      value: values.join(':').trim(),
+      value: values.slice(1).join(':').trim(),
     }))
     .reduce<Record<string, string | string[]>>(
       (previous, { key, value }: { key: string; value: string }) => {

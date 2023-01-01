@@ -15,11 +15,15 @@ describe('WhoisParser', () => {
       `expiry date: ${date}\ncreated: ${date}\nupdated date: ${date}`,
     );
 
-    const diff = (val: any) => Math.abs(date.getTime() - val.getTime());
+    const diff = (val: Date) => Math.abs(date.getTime() - val.getTime());
 
-    expect(diff(expiration)).toBeLessThanOrEqual(1000);
-    expect(diff(created)).toBeLessThanOrEqual(1000);
-    expect(diff(updated)).toBeLessThanOrEqual(1000);
+    expect(expiration).toBeInstanceOf(Date);
+    expect(created).toBeInstanceOf(Date);
+    expect(updated).toBeInstanceOf(Date);
+
+    expect(diff(expiration as Date)).toBeLessThanOrEqual(1000);
+    expect(diff(created as Date)).toBeLessThanOrEqual(1000);
+    expect(diff(updated as Date)).toBeLessThanOrEqual(1000);
   });
 
   it('returns properties with one value as a string', () => {

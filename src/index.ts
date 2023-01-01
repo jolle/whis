@@ -1,5 +1,6 @@
 import { TCPHelper } from './TCPHelper';
 import WhoisParser, { WhoisResult } from './WhoisParser';
+// eslint-disable-next-line @typescript-eslint/no-var-requires
 const whisData = require('whis-data');
 
 export { TCPHelper, WhoisParser, WhoisResult };
@@ -22,19 +23,25 @@ const getRaw = async (domain: string, server?: string) => {
 
   const tcp = new TCPHelper(whoisServer, 43);
 
-  return new Promise<string>(async (resolve, reject) => {
+  return new Promise<string>((resolve, reject) => {
     let hasError = false;
     tcp.on('error', (err) => {
       hasError = true;
       reject(err);
     });
 
-    const data = await tcp.send(domain, true);
-    if (hasError) return;
+    tcp
+      .send(domain, true)
+      .then((buffer) => {
+        if (hasError) return;
 
-    if (!data) return reject(Error("Whois server didn't reply with any data"));
+        if (!buffer) {
+          throw Error('Domain not found');
+        }
 
-    resolve(data.toString());
+        resolve(buffer.toString());
+      })
+      .catch((error) => !hasError && reject(error));
   });
 };
 
